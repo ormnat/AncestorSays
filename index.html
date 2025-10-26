@@ -4,25 +4,309 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ancestor Says</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- Use the Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the game buttons */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Gradient background */
+            background: linear-gradient(135deg, #1f2937, #374151);
+        }
+
+        /* Original Simon Says colors */
+        .game-button.red { background-color: #DC2626; } /* Tailwind red-600 */
+        .game-button.green { background-color: #16A34A; } /* Tailwind green-600 */
+        .game-button.blue { background-color: #2563EB; } /* Tailwind blue-600 */
+        .game-button.yellow { background-color: #D97706; } /* Tailwind amber-600 */
+
+        /* This class is added by JS to make the button "light up" */
+        .game-button.active {
+            filter: brightness(1.75);
+            /* Add a subtle glow effect when active */
+            box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.3);
+        }
+    </style>
 </head>
-<body>
-    <div class="game-container">
-        <h1>Ancestor Says</h1>
-        <div class="score">Round: <span id="round-counter">0</span></div>
-        <div class="game-board">
-            <div class="game-button red" id="red"></div>
-            <div class="game-button green" id="green"></div>
-            <div class="game-button blue" id="blue"></div>
-            <div class="game-button yellow" id="yellow"></div>
+<body class="flex items-center justify-center min-h-screen text-gray-200 p-4">
+
+    <div class="game-container bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+        
+        <h1 class="text-3xl sm:text-4xl font-bold text-amber-400 mb-4">Ancestor Says</h1>
+        
+        <div class="score text-xl sm:text-2xl mb-6">
+            Round: <span id="round-counter" class="font-bold text-white">0</span>
         </div>
-        <button id="start-button">Start Game</button>
-        <div id="win-message" class="hidden">
-            <h2>Congratulations! You are the Master Chef!</h2>
-            <!-- The image will be displayed here --><img src="ancestor_says_win.png" alt="Dyllin Rumsey - The Master Chef" class="winner-image">
+
+        <!-- Game Board -->
+        <div class="game-board grid grid-cols-2 gap-4 sm:gap-6 aspect-square max-w-sm mx-auto mb-6">
+            <!-- The buttons are square by default due to aspect-square on the grid cells -->
+            <div class="aspect-square"><div class="game-button red w-full h-full rounded-xl sm:rounded-2xl border-4 border-gray-900 shadow-lg cursor-pointer transition-all duration-100 ease-in-out" id="red"></div></div>
+            <div class="aspect-square"><div class="game-button green w-full h-full rounded-xl sm:rounded-2xl border-4 border-gray-900 shadow-lg cursor-pointer transition-all duration-100 ease-in-out" id="green"></div></div>
+            <div class="aspect-square"><div class="game-button blue w-full h-full rounded-xl sm:rounded-2xl border-4 border-gray-900 shadow-lg cursor-pointer transition-all duration-100 ease-in-out" id="blue"></div></div>
+            <div class="aspect-square"><div class="game-button yellow w-full h-full rounded-xl sm:rounded-2xl border-4 border-gray-900 shadow-lg cursor-pointer transition-all duration-100 ease-in-out" id="yellow"></div></div>
+        </div>
+
+        <!-- Start Button -->
+        <button id="start-button" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg text-xl font-semibold shadow-lg hover:bg-green-500 active:bg-green-700 transition-colors duration-150 transform hover:scale-105 active:scale-100">
+            Start Game
+        </button>
+
+        <!-- Win Message (Hidden by default) -->
+        <!-- MOVED OUTSIDE of game-container to overlay the whole site -->
+        
+        <!-- Game Over Message Box (Hidden by default) -->
+        <div id="game-over-box" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+            <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl text-center border-2 border-red-500">
+                <h2 class="text-3xl font-bold text-red-500 mb-4">Game Over!</h2>
+                <p class="text-xl text-white mb-6">You reached Round <span id="final-round">0</span>.</p>
+                <button id="restart-button" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg text-xl font-semibold shadow-lg hover:bg-green-500 active:bg-green-700 transition-colors duration-150">
+                    Play Again
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Win Message (Now overlays the whole site) -->
+    <div id="win-message" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-50">
+        <div class="text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Congratulations!</h2>
+            <p class="text-2xl text-amber-300 mb-6">You are The Master Chef!</p>
+            <!-- This will display the image you uploaded -->
+            <img src="The Chef.jpg" alt="The Master Chef" class="winner-image w-auto h-[60vh] sm:h-[70vh] max-w-full mx-auto rounded-lg shadow-2xl border-4 border-amber-300 object-contain mb-8">
+            <button id="play-again-win-button" class="bg-green-600 text-white py-3 px-8 rounded-lg text-xl font-semibold shadow-lg hover:bg-green-500 active:bg-green-700 transition-colors duration-150 transform hover:scale-105 active:scale-100">
+                Play Again
+            </button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+
+    <script>
+        // --- DOM Elements ---
+        const colors = ["red", "green", "blue", "yellow"];
+        const gameButtons = document.querySelectorAll(".game-button");
+        const startButton = document.getElementById("start-button");
+        const roundCounterDisplay = document.getElementById("round-counter");
+        const winMessage = document.getElementById("win-message");
+        const gameOverBox = document.getElementById("game-over-box");
+        const finalRoundDisplay = document.getElementById("final-round");
+        const restartButton = document.getElementById("restart-button");
+        const playAgainWinButton = document.getElementById("play-again-win-button");
+        const gameContainer = document.querySelector(".game-container");
+
+
+        // --- Game State ---
+        let gameSequence = [];
+        let playerSequence = [];
+        let round = 0;
+        let canClick = false; // Prevents player from clicking during sequence display
+
+        // --- Audio Setup (Web Audio API) ---
+        let audioCtx;
+        let isAudioInitialized = false;
+
+        // Frequencies for the tones (similar to original Simon)
+        const frequencies = {
+            'green': 311.13, // Eb4
+            'red': 220.00,   // A3
+            'yellow': 277.18, // C#4
+            'blue': 329.63,  // E4
+        };
+
+        // Function to initialize AudioContext (must be done on user gesture)
+        function initAudio() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    isAudioInitialized = true;
+                } catch (e) {
+                    console.error("Web Audio API is not supported in this browser", e);
+                }
+            }
+        }
+
+        // Function to play a tone for a specific color
+        function playSound(color) {
+            if (!isAudioInitialized || !audioCtx || !frequencies[color]) return;
+
+            // Resume context if it was suspended (common on mobile)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = frequencies[color];
+            oscillator.type = 'triangle'; // 'triangle' sounds more 'retro' than 'sine'
+
+            // Control volume & prevent clicking sound
+            const now = audioCtx.currentTime;
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.5, now + 0.05); // Quick fade in
+            gainNode.gain.linearRampToValueAtTime(0, now + 0.25); // Fade out
+
+            oscillator.start(now);
+            oscillator.stop(now + 0.3); // Play sound for 0.3 seconds
+        }
+
+        // --- Game Logic ---
+
+        function startGame() {
+            // Initialize audio on the first click
+            if (!isAudioInitialized) {
+                initAudio();
+            }
+
+            startButton.classList.add("hidden");
+            winMessage.classList.add("hidden");
+            gameOverBox.classList.add("hidden");
+            gameContainer.classList.remove("hidden"); // Make sure game container is visible
+            
+            gameSequence = [];
+            playerSequence = [];
+            round = 0;
+            roundCounterDisplay.textContent = round;
+            
+            // Start the first round
+            setTimeout(nextRound, 700);
+        }
+
+        function nextRound() {
+            canClick = false;
+            playerSequence = [];
+            round++;
+            roundCounterDisplay.textContent = round;
+
+            // Add a new random color to the game sequence
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            gameSequence.push(randomColor);
+
+            // Display the sequence to the player
+            displaySequence();
+        }
+
+        function displaySequence() {
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < gameSequence.length) {
+                    const button = document.getElementById(gameSequence[i]);
+                    lightUpButton(button);
+                    playSound(gameSequence[i]); // Play sound for the color
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    canClick = true; // Allow player to click
+                }
+            }, 600); // Time between flashes (600ms)
+        }
+
+        // Makes a button "flash"
+        function lightUpButton(button) {
+            button.classList.add("active");
+            setTimeout(() => {
+                button.classList.remove("active");
+            }, 300); // How long the button stays lit (300ms)
+        }
+
+        function handlePlayerClick(event) {
+            if (!canClick) return; // Ignore clicks if not player's turn
+
+            // Resume audio context just in case (e.g., mobile)
+            if (isAudioInitialized && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const clickedColor = event.target.id;
+            if (!clickedColor) return; // Ignore clicks on the grid gap
+
+            playerSequence.push(clickedColor);
+            lightUpButton(event.target);
+            playSound(clickedColor);
+
+            checkPlayerSequence();
+        }
+
+        function checkPlayerSequence() {
+            const lastPlayerIndex = playerSequence.length - 1;
+
+            // 1. Check if the last clicked color is correct
+            if (playerSequence[lastPlayerIndex] !== gameSequence[lastPlayerIndex]) {
+                gameOver();
+                return;
+            }
+
+            // 2. Check if the player has completed the current round sequence
+            if (playerSequence.length === gameSequence.length) {
+                // Check for winning condition (4 rounds)
+                if (round === 4) {
+                    gameWon();
+                    return;
+                }
+                
+                // If correct and not won yet, move to the next round
+                canClick = false; // Prevent clicking between rounds
+                setTimeout(nextRound, 1000); // Wait 1 second before next round
+            }
+            // If sequence is not complete, wait for next player click
+        }
+
+        function gameOver() {
+            canClick = false;
+            playSound('red'); // Play a 'wrong' sound (using red's tone)
+            finalRoundDisplay.textContent = round;
+            gameOverBox.classList.remove("hidden");
+        }
+        
+        function restartGame() {
+            gameOverBox.classList.add("hidden");
+            gameContainer.classList.remove("hidden"); // Ensure game container is visible
+            startGame();
+        }
+
+        function gameWon() {
+            canClick = false;
+            roundCounterDisplay.textContent = 4;
+            winMessage.classList.remove("hidden"); // Show the win overlay
+            gameContainer.classList.add("hidden"); // Hide the game container
+            
+            // The "Play Again" button is now on the win screen
+        }
+
+        function restartFromWin() {
+            winMessage.classList.add("hidden");
+            gameContainer.classList.remove("hidden");
+            startGame();
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener("click", startGame);
+        restartButton.addEventListener("click", restartGame);
+        playAgainWinButton.addEventListener("click", restartFromWin);
+
+        // Add click listener to the game board, but delegate to buttons
+        document.querySelector(".game-board").addEventListener("click", handlePlayerClick);
+        
+        // Add touch listeners for mobile
+        document.querySelector(".game-board").addEventListener("touchstart", (e) => {
+             // Prevent 'ghost' clicks on mobile
+            e.preventDefault();
+            // Find the element that was touched
+            const touchTarget = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+            if (touchTarget && touchTarget.classList.contains('game-button')) {
+                handlePlayerClick({ target: touchTarget });
+            }
+        }, { passive: false });
+
+    </script>
 </body>
 </html>
+
