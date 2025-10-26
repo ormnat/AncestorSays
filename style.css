@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #2c3e50; /* Dark background */
+    margin: 0;
+    overflow: hidden; /* Prevent scrolling if elements slightly exceed viewport */
+}
+
+.game-container {
+    background-color: #34495e; /* Slightly lighter container */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    color: #ecf0f1; /* Light text color */
+}
+
+h1 {
+    color: #f1c40f; /* Yellowish title */
+    margin-bottom: 20px;
+}
+
+.score {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(2, 100px); /* Two columns, 100px each */
+    grid-template-rows: repeat(2, 100px);    /* Two rows, 100px each */
+    gap: 15px; /* Space between buttons */
+    margin: 0 auto 20px auto;
+    width: fit-content; /* Adjust width to fit the grid */
+}
+
+.game-button {
+    width: 100px;
+    height: 100px;
+    border-radius: 5px; /* Slightly rounded corners for square buttons */
+    border: 5px solid #bdc3c7; /* Gray border */
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+
+/* Original Simon Says colors */
+.game-button.red {
+    background-color: #e74c3c; /* Red */
+}
+.game-button.green {
+    background-color: #2ecc71; /* Green */
+}
+.game-button.blue {
+    background-color: #3498db; /* Blue */
+}
+.game-button.yellow {
+    background-color: #f1c40f; /* Yellow */
+}
+
+.game-button:active,
+.game-button.active { /* Class for when button lights up */
+    filter: brightness(1.5); /* Make it brighter when active/clicked */
+    transform: scale(0.98);
+}
+
+#start-button {
+    background-color: #27ae60; /* Green start button */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+}
+
+#start-button:hover {
+    background-color: #219d55;
+}
+
+.hidden {
+    display: none;
+}
+
+#win-message {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #2ecc71; /* Green success background */
+    border-radius: 10px;
+    color: white;
+}
+
+.winner-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 600px) {
+    .game-board {
+        grid-template-columns: repeat(2, 80px);
+        grid-template-rows: repeat(2, 80px);
+        gap: 10px;
+    }
+    .game-button {
+        width: 80px;
+        height: 80px;
+    }
+    .game-container {
+        padding: 15px;
+        margin: 10px;
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ancestor Says</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Ancestor Says</h1>
+        <div class="score">Round: <span id="round-counter">0</span></div>
+        <div class="game-board">
+            <div class="game-button red" id="red"></div>
+            <div class="game-button green" id="green"></div>
+            <div class="game-button blue" id="blue"></div>
+            <div class="game-button yellow" id="yellow"></div>
+        </div>
+        <button id="start-button">Start Game</button>
+        <div id="win-message" class="hidden">
+            <h2>Congratulations! You are the Master Chef!</h2>
+            <!-- The image will be displayed here --><img src="ancestor_says_win.png" alt="Dyllin Rumsey - The Master Chef" class="winner-image">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
