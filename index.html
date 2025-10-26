@@ -76,7 +76,6 @@
     <div id="win-message" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm flex flex-col items-center justify-center p-4 z-50">
         <div class="text-center">
             <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Congratulations!</h2>
-            <p class="text-2xl text-amber-300 mb-6">You are The Master Chef!</p>
             <!-- This will display the image you uploaded -->
             <img src="The Chef.jpg" alt="The Master Chef" class="winner-image w-auto h-[60vh] sm:h-[70vh] max-w-full mx-auto rounded-lg shadow-2xl border-4 border-amber-300 object-contain mb-8">
             <button id="play-again-win-button" class="bg-green-600 text-white py-3 px-8 rounded-lg text-xl font-semibold shadow-lg hover:bg-green-500 active:bg-green-700 transition-colors duration-150 transform hover:scale-105 active:scale-100">
@@ -246,8 +245,8 @@
 
             // 2. Check if the player has completed the current round sequence
             if (playerSequence.length === gameSequence.length) {
-                // Check for winning condition (4 rounds)
-                if (round === 4) {
+                // Check for winning condition (10 rounds)
+                if (round === 10) {
                     gameWon();
                     return;
                 }
@@ -274,7 +273,7 @@
 
         function gameWon() {
             canClick = false;
-            roundCounterDisplay.textContent = 4;
+            roundCounterDisplay.textContent = 10;
             winMessage.classList.remove("hidden"); // Show the win overlay
             gameContainer.classList.add("hidden"); // Hide the game container
             
@@ -309,4 +308,5 @@
     </script>
 </body>
 </html>
+
 
